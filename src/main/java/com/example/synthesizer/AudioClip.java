@@ -1,25 +1,25 @@
 package com.example.synthesizer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class AudioClip {
     static double duration = 2.0;
-    int sampleRate = 44100;
-    byte[] samples;
+    static int sampleRate = 44100;
+    byte[] datas = new byte[ 44100*2*2 ];
 
-    int getSample(int i) {
-        int lower = samples[ 2 * i ];
-        int upper = samples [ ( 2 * i ) + 1 ] << 8;
+    public int getSample(int i) {
+        int lower = Byte.toUnsignedInt(datas[ 2 * i ]); // use mask to avoid the signed digit
+        int upper = datas[ ( 2 * i ) + 1 ] << 8 & 0xFF00;
         return upper | lower;
     }
 
-    void setSample(int i, short value){
-        samples[2 * i] = (byte) (value & 0x00FF);
-        samples[( 2 * i ) + 1] = (byte) (value >> 8);
+    public void setSample(int i, short value){
+        datas[2 * i] = (byte) (value & 0xFF);
+        datas[( 2 * i ) + 1] = (byte) (value >> 8);
     }
 
-    byte[] getData(){
-        return Arrays.copyOf(samples, samples.length);
+    public byte[] getData(){
+        return Arrays.copyOf(datas, datas.length);
     }
 }
+
