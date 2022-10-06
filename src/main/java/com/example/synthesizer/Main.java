@@ -6,30 +6,19 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
+import java.util.ArrayList;
 
 public class Main {
-    static void getSampleTest() {
+    static void SampleTest(){
         AudioClip a1 = new AudioClip();
-        a1.datas[0] = (byte) 0x1A;
-        a1.datas[1] = (byte) 0x2B;
-        a1.datas[2] = (byte) 0xA1;
-        a1.datas[3] = (byte) 0xFF;
-        Assertions.assertEquals(0x2B1A, a1.getSample(0)); // positive number
-        Assertions.assertEquals(0xFFA1, a1.getSample(1)); // negative number
-    }
-
-    static void setSampleTest(){
-        AudioClip a2 = new AudioClip();
-        a2.setSample(0, (short) 0x3ABC);
-        a2.setSample(2, (short) 0xFF33);
-        Assertions.assertEquals(0x3ABC, a2.getSample(0)); // positive number
-        Assertions.assertEquals(0xFF33, a2.getSample(2)); // negative number
+        for (short i = Short.MIN_VALUE; i < Short.MAX_VALUE; i++){
+            a1.setSample(0, i);
+            Assertions.assertEquals(i, a1.getSample(0));
+        }
     }
 
     public static void main(String[] args) throws LineUnavailableException {
-//        getSampleTest();
-//        setSampleTest();
-
+        SampleTest();
         // Get properties from the system about samples rates, etc.
         // AudioSystem is a class from the Java standard library.
         Clip c = AudioSystem.getClip(); // Note, this is different from our AudioClip class.
@@ -37,9 +26,25 @@ public class Main {
         // This is the format that we're following, 44.1 KHz mono audio, 16 bits per sample.
         AudioFormat format16 = new AudioFormat( 44100, 16, 1, true, false );
 
-        AudioComponent gen = new SineWave(440); // Your code
-        AudioClip clip = gen.getClip();         // Your code
 
+        // Create each component
+        AudioComponent gen1 = new SineWave(440);
+        AudioComponent gen2 = new SineWave(220);
+
+        // Mixer
+        Mixer mixer = new Mixer();
+        mixer.connectInput(gen1);
+        mixer.connectInput(gen2);
+
+        // Filter
+        Filter volume = new Filter(1.2);
+        volume.connectInput(mixer);
+
+        // Clip to be played
+        AudioClip clip = volume.getClip();
+
+
+        // Play method by library
         c.open( format16, clip.getData(), 0, clip.getData().length ); // Reads data from our byte array to play it.
 
         System.out.println( "About to play..." );

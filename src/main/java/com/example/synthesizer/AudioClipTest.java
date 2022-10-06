@@ -8,7 +8,7 @@ class AudioClipTest {
     @Test
     void getSample() {
         AudioClip a1 = new AudioClip();
-        a1.datas = new byte[]{0x3c, (byte) 0xa2, 0x01, (byte) 0xff};
+        a1.sampleData = new byte[]{0x3c, (byte) 0xa2, 0x01, (byte) 0xff};
         Assertions.assertEquals(0xff01, a1.getSample(1));
     }
 
