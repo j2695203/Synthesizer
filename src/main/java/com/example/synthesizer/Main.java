@@ -30,19 +30,22 @@ public class Main {
         // Create each component
         AudioComponent gen1 = new SineWave(440);
         AudioComponent gen2 = new SineWave(220);
+        AudioComponent gen3 = new LinearRamp(50,2000);
+        VFSineWave vfSineWave = new VFSineWave();
 
-        // Mixer
+        // Mixer, Processor
         Mixer mixer = new Mixer();
         mixer.connectInput(gen1);
         mixer.connectInput(gen2);
+        vfSineWave.connectInput(gen3);
 
         // Filter
-        Filter volume = new Filter(1.2);
-        volume.connectInput(mixer);
+        Filter volume = new Filter(0.5);
+//        volume.connectInput(mixer);
+        volume.connectInput(vfSineWave);
 
         // Clip to be played
         AudioClip clip = volume.getClip();
-
 
         // Play method by library
         c.open( format16, clip.getData(), 0, clip.getData().length ); // Reads data from our byte array to play it.
