@@ -8,7 +8,7 @@ public class VFSineWave implements AudioComponent{
         int numSamples = original_.getData().length / 2 ;
         double phase = 0;
         for( int i = 0; i < numSamples; i++){
-            phase += ( 2 * Math.PI * original_.getSample(i) )/ AudioClip.sampleRate;
+            phase += ( 2 * Math.PI * original_.getSample(i) )/ result.sampleRate;
             result.setSample(i, clamping ((int) (Short.MAX_VALUE * Math.sin(phase))));
         }
         return result;

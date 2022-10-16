@@ -18,7 +18,7 @@ import javafx.scene.shape.Circle;
 
 public class AudioComponentWidget extends Pane {
 //    AudioComponent ac_;
-    AnchorPane parent_;
+    AnchorPane parent_; // = mainCanvas
     AudioComponentWidget(AudioComponent ac, AnchorPane parent){
 //        ac_ = ac;
         parent_ = parent;
@@ -29,9 +29,9 @@ public class AudioComponentWidget extends Pane {
         // LEFT PANEL
         VBox leftPanel = new VBox();
         // items
-        Label title = new Label("Sine Wave (440 Hz)");  // 要動態改
+        Label title = new Label("Sine Wave (440 Hz)");  // should be modified with slider
         Slider slider = new Slider(220,880,440);
-        slider.setOnMouseDragged( e -> handleSlider(e, slider, title) );
+        slider.setOnMouseDragged( e -> handleSlider(e, slider, title) ); // modify title and frequency
         // add to parent
         leftPanel.getChildren().add(title);
         leftPanel.getChildren().add(slider);
@@ -57,11 +57,11 @@ public class AudioComponentWidget extends Pane {
         rightPanel.setPadding( new Insets(5) );
         rightPanel.setSpacing( 5 );
 
-        // adjust location, not overlap when creating
+        // adjust widget's location, not overlap when creating
         this.setLayoutX(50+10*SynthesizeApplication.widgets.size());
         this.setLayoutY(100+10*SynthesizeApplication.widgets.size());
 
-        // ADD TO PARENT    ////// why this?
+        // ADD TO PARENT
         this.getChildren().add(baseLayout);
         parent_.getChildren().add( this );
     }
@@ -69,6 +69,7 @@ public class AudioComponentWidget extends Pane {
     private void handleSlider(MouseEvent e, Slider slider, Label title) {
         int value = (int) slider.getValue();
         title.setText("Sine Wave (" + value + " Hz)");
+        // 改變音頻/////////////////////
     }
 
     private void closeWidget(ActionEvent e) {

@@ -8,7 +8,7 @@ public class Mixer implements AudioComponent{
     @Override
     public AudioClip getClip() {
         AudioClip result = new AudioClip();
-        for (int numSample = 0; numSample < clips_.get(0).sampleData.length/2; numSample++ ){ // fixed num 422
+        for (int numSample = 0; numSample < clips_.get(0).sampleData.length/2; numSample++ ){ // fixed num 44100
             int sumValue = 0;
             for ( int numClip = 0; numClip < clips_.size(); numClip++){
                 sumValue +=  clips_.get(numClip).getSample(numSample) ;
