@@ -18,8 +18,14 @@ import javafx.scene.shape.Line;
 
 public class SineWaveWidget extends AudioComponentWidgetBase {
     SineWaveWidget(AudioComponent ac, AnchorPane parent){
-        super(ac, parent);
+        super(parent);
+        super.ac_ = ac;
 
+        Label title = new Label("Sine Wave (440 Hz)");  // should be modified with slider
+        Slider slider = new Slider(220,880,440);
+        slider.setOnMouseDragged( e -> handleSlider(e, slider, title) ); // modify title and frequency
+        super.setEachWidget( title, slider );
+        super.addToParent();
     }
 
 

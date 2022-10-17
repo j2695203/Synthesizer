@@ -19,41 +19,40 @@ import javafx.scene.shape.Line;
 public class AudioComponentWidgetBase extends Pane {
     protected AudioComponent ac_;
     protected AnchorPane parent_; // = mainCanvas
+    private HBox baseLayout_;
+    private VBox leftPanel_;
+    private VBox centralPanel_;
+    private VBox rightPanel_;
     protected Label title_;
     protected Slider slider_;
     private double mouseStartDragX_, mouseStartDragY_, widgetStartDragX_, widgetStartDragY_;
     private Line line_ = null;
     private Circle outputDot;
-    AudioComponentWidgetBase(AudioComponent ac, AnchorPane parent){
-        ac_ = ac;
+    private Circle inputDot;
+    AudioComponentWidgetBase(AnchorPane parent){
         parent_ = parent;
 
         // widget frame
-        HBox baseLayout = new HBox();
-        baseLayout.setStyle("-fx-border-color: black; -fx-border-image-width: 8; -fx-background-color: bisque");
+        baseLayout_ = new HBox();
+        baseLayout_.setStyle("-fx-border-color: black; -fx-border-image-width: 8; -fx-background-color: bisque");
 
         // LEFT PANEL
+        leftPanel_= new VBox();
+        inputDot = new Circle(10);
+        inputDot.setFill( Color.GRAY);
+        // add to parent
+        leftPanel_.getChildren().add(inputDot);
 
         // CENTRAL PANEL
-        VBox centralPanel = new VBox();
-
-        // 應放SineWaveWidget
-        title_ = new Label("Sine Wave (440 Hz)");  // should be modified with slider
-        slider_ = new Slider(220,880,440);
-        slider_.setOnMouseDragged( e -> handleSlider(e, slider_, title_) ); // modify title and frequency
-
+        centralPanel_ = new VBox();
 
         // drag the widget to move
-        centralPanel.setOnMousePressed( e -> startDrag( e ) );
-        centralPanel.setOnMouseDragged( e -> handleDrag( e, outputDot ) );
-        // add to parent
-        centralPanel.getChildren().add(title_);
-        centralPanel.getChildren().add(slider_);
-        baseLayout.getChildren().add(centralPanel);
+        centralPanel_.setOnMousePressed(e -> startDrag( e ) );
+        centralPanel_.setOnMouseDragged(e -> handleDrag( e, outputDot ) );
 
 
         // RIGHT PANEL
-        VBox rightPanel = new VBox();
+        rightPanel_ = new VBox();
         // items
         Button closeBtn = new Button("X");
         closeBtn.setOnAction( e -> closeWidget(e) );
@@ -64,25 +63,35 @@ public class AudioComponentWidgetBase extends Pane {
         outputDot.setOnMouseDragged( e -> moveConnection( e ) ); // draw a line to the dragging mouse's position
         outputDot.setOnMouseReleased( e -> endConnection( e ) ); // delete the line or draw a connection line to speaker
         // add to parent
-        rightPanel.getChildren().add(closeBtn);
-        rightPanel.getChildren().add(outputDot);
-        baseLayout.getChildren().add(rightPanel);
+        rightPanel_.getChildren().add(closeBtn);
+        rightPanel_.getChildren().add(outputDot);
+
 
         // ADJUST LAYOUT
-        centralPanel.setAlignment(Pos.CENTER);
-        centralPanel.setPadding( new Insets(5) );
-        centralPanel.setSpacing( 5 );
-        rightPanel.setAlignment(Pos.CENTER);
-        rightPanel.setPadding( new Insets(5) );
-        rightPanel.setSpacing( 5 );
+        centralPanel_.setAlignment(Pos.CENTER);
+        centralPanel_.setPadding( new Insets(5) );
+        centralPanel_.setSpacing( 5 );
+        rightPanel_.setAlignment(Pos.CENTER);
+        rightPanel_.setPadding( new Insets(5) );
+        rightPanel_.setSpacing( 5 );
         // adjust widget's location, not overlap when creating
         this.setLayoutX(50+10*SynthesizeApplication.widgets.size());
         this.setLayoutY(100+10*SynthesizeApplication.widgets.size());
 
-        // ADD TO PARENT
-        this.getChildren().add(baseLayout);
-        parent_.getChildren().add( this );
+    }
 
+
+
+    protected void addToParent(){
+        // add to parent
+        centralPanel_.getChildren().add(title_);
+        centralPanel_.getChildren().add(slider_);
+        baseLayout_.getChildren().add(leftPanel_);
+        baseLayout_.getChildren().add(centralPanel_);
+        baseLayout_.getChildren().add(rightPanel_);
+        // ADD TO PARENT
+        this.getChildren().add(baseLayout_);
+        parent_.getChildren().add( this );
     }
 
     private void startDrag(MouseEvent e) { // save the original position
@@ -157,13 +166,27 @@ public class AudioComponentWidgetBase extends Pane {
         return ac_;
     }
 
-    // 應放SineWaveWidget
-    private void handleSlider(MouseEvent e, Slider slider, Label title) {
+    protected void setEachWidget( Label title, Slider slider){
+        title_ = title;
+        slider_ = slider;
+//        title_ = new Label("Sine Wave (440 Hz)");  // should be modified with slider
+//        slider_ = new Slider(220,880,440);
+//        slider_.setOnMouseDragged( e -> handleSlider(e, slider_, title_) ); // modify title and frequency
+    }
+
+    // slider for sine wave
+    protected void handleSlider(MouseEvent e, Slider slider, Label title) {
         int value = (int) slider.getValue();
+
         // modify title
         title.setText("Sine Wave (" + value + " Hz)");
         // modify frequency
         ac_ = new SineWave(value); // 只能新增新的？不能調原本的？
+    }
+
+    // slider for others ( without changing title )
+    protected void handleSlider(MouseEvent e, Slider slider) {
+        int value = (int) slider.getValue();
     }
 
 

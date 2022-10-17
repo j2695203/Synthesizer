@@ -47,8 +47,13 @@ public class SynthesizeApplication extends Application {
         // sineWaveBtn
         Button sineWaveBtn = new Button("Create Sine Wave");
         sineWaveBtn.setOnAction( e -> createSineWaveComponent(e, widgets));
+        // volumeBtn
+        Button volumeBtn = new Button("Create Volume Widget");
+        volumeBtn.setOnAction( e -> createVolumeComponent(e, widgets));
+
         // add to Parent
         rightPanel.getChildren().add(sineWaveBtn);
+        rightPanel.getChildren().add(volumeBtn);
 
         // BOTTOM PANEL
         HBox bottomPanel = new HBox();
@@ -70,6 +75,8 @@ public class SynthesizeApplication extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
+
 
     private void handlePlay(ActionEvent e) {
         // when no connected widgets
@@ -141,6 +148,12 @@ public class SynthesizeApplication extends Application {
         System.out.println("in create sine wave component");
         AudioComponent sineWave = new SineWave(440);
         AudioComponentWidgetBase acw = new SineWaveWidget(sineWave, mainCanvas_);
+        widgets.add(acw);
+    }
+
+    private void createVolumeComponent(ActionEvent e, ArrayList<AudioComponentWidgetBase> widgets) {
+        System.out.println("in create volume component");
+        AudioComponentWidgetBase acw = new VolumeWidget( mainCanvas_ );
         widgets.add(acw);
     }
 
