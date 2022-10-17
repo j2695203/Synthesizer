@@ -17,26 +17,9 @@ import javafx.scene.shape.Line;
 
 
 public class SineWaveWidget extends AudioComponentWidgetBase {
-
     SineWaveWidget(AudioComponent ac, AnchorPane parent){
         super(ac, parent);
 
-        // CENTRAL PANEL
-
-        // items
-        title_ = new Label("Sine Wave (440 Hz)");  // should be modified with slider
-        slider_ = new Slider(220,880,440);
-        slider_.setOnMouseDragged( e -> handleSlider(e, slider_, title_) ); // modify title and frequency
-
-    }
-
-
-    private void handleSlider(MouseEvent e, Slider slider, Label title) {
-        int value = (int) slider.getValue();
-        // modify title
-        title.setText("Sine Wave (" + value + " Hz)");
-        // modify frequency
-        ac_ = new SineWave(value); // 只能新增新的？不能調原本的？
     }
 
 

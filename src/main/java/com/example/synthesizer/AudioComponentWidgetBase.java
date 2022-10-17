@@ -27,6 +27,7 @@ public class AudioComponentWidgetBase extends Pane {
     AudioComponentWidgetBase(AudioComponent ac, AnchorPane parent){
         ac_ = ac;
         parent_ = parent;
+
         // widget frame
         HBox baseLayout = new HBox();
         baseLayout.setStyle("-fx-border-color: black; -fx-border-image-width: 8; -fx-background-color: bisque");
@@ -35,6 +36,13 @@ public class AudioComponentWidgetBase extends Pane {
 
         // CENTRAL PANEL
         VBox centralPanel = new VBox();
+
+        // 應放SineWaveWidget
+        title_ = new Label("Sine Wave (440 Hz)");  // should be modified with slider
+        slider_ = new Slider(220,880,440);
+        slider_.setOnMouseDragged( e -> handleSlider(e, slider_, title_) ); // modify title and frequency
+
+
         // drag the widget to move
         centralPanel.setOnMousePressed( e -> startDrag( e ) );
         centralPanel.setOnMouseDragged( e -> handleDrag( e, outputDot ) );
@@ -147,6 +155,15 @@ public class AudioComponentWidgetBase extends Pane {
 
     public AudioComponent getAc_() {
         return ac_;
+    }
+
+    // 應放SineWaveWidget
+    private void handleSlider(MouseEvent e, Slider slider, Label title) {
+        int value = (int) slider.getValue();
+        // modify title
+        title.setText("Sine Wave (" + value + " Hz)");
+        // modify frequency
+        ac_ = new SineWave(value); // 只能新增新的？不能調原本的？
     }
 
 
