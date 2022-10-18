@@ -15,4 +15,5 @@ public interface AudioComponent {
             return (short) (value);
         }
     }
+
 }
