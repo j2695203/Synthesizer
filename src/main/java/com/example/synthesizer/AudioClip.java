@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class AudioClip {
     static double duration = 2.0;
     static int sampleRate = 44100;
-    byte[] sampleData = new byte[ 44100*2*2 ];
+    byte[] sampleData = new byte[ 44100*2*2 ]; // rate * duration * (byte)short
 
     public int getSample(int i) {
         int lower = Byte.toUnsignedInt(sampleData[ 2 * i ]);

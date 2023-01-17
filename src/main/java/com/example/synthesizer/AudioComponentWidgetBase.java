@@ -31,7 +31,7 @@ public class AudioComponentWidgetBase extends Pane {
     private Line outputLine_ = null;
     private Circle outputDot;
     protected Circle inputDot;
-    private ArrayList<AudioComponentWidgetBase> inputConnectedWidgets = new ArrayList<>();
+    protected ArrayList<AudioComponentWidgetBase> inputConnectedWidgets = new ArrayList<>();
     private AudioComponentWidgetBase outputConnectedWidget = null;
 
     AudioComponentWidgetBase(AnchorPane parent){
@@ -92,7 +92,9 @@ public class AudioComponentWidgetBase extends Pane {
     protected void addToParent(){
         // add to parent
         centralPanel_.getChildren().add(title_);
-        centralPanel_.getChildren().add(slider_);
+        if( slider_ != null ){
+            centralPanel_.getChildren().add(slider_);
+        }
         baseLayout_.getChildren().add(leftPanel_);
         baseLayout_.getChildren().add(centralPanel_);
         baseLayout_.getChildren().add(rightPanel_);
@@ -121,9 +123,9 @@ public class AudioComponentWidgetBase extends Pane {
             outputLine_.setStartX( bounds.getCenterX() - parentBounds.getMinX() );
             outputLine_.setStartY( bounds.getCenterY() - parentBounds.getMinY() );
         }
-        // inputDot's line
+        // inputDot's line 要寫成通用的！！！！
         // 若是volume且sineWave有line, 則sineWave line 的 end point 要隨著 volume 的 inputDot 移動
-        if ( ( this.title_.getText().contains("Volume") ) && ( this.inputConnectedWidgets.size() > 0 ) ){
+        if (  ( this.inputConnectedWidgets.size() > 0 ) ){
             Bounds parentBounds = parent_.getBoundsInParent(); // this code doesn't have parent bound issue
             Bounds bounds = this.inputDot.localToScene( this.inputDot.getBoundsInLocal() );
             for( AudioComponentWidgetBase w: this.inputConnectedWidgets){
@@ -168,7 +170,7 @@ public class AudioComponentWidgetBase extends Pane {
             parent_.getChildren().remove(outputLine_);
             outputConnectedWidget = null;
             SynthesizeApplication.speakerConnectedWidgets.remove(this );
-//            this.inputConnectedWidgets.remove(this ); // 應是下面連接的inputConneted
+//            this.inputConnectedWidgets.remove(this ); // 應是下面連接的inputConnected
         }else{
             Bounds parentBounds = parent_.getBoundsInParent(); // this code doesn't have parent bound issue
             Bounds bounds = outputDot.localToScene( outputDot.getBoundsInLocal() );
@@ -192,14 +194,17 @@ public class AudioComponentWidgetBase extends Pane {
         Circle speaker = SynthesizeApplication.speakerCircle;
         Bounds speakerBounds = speaker.localToScene( speaker.getBoundsInLocal() );
         double distanceToSpeaker = Math.sqrt( Math.pow( speakerBounds.getCenterX() - e.getSceneX(), 2.0 ) + Math.pow( speakerBounds.getCenterY() - e.getSceneY(), 2.0 ) );
-
+        // connect to speaker
         if( distanceToSpeaker < 13 ){
             outputLine_.setEndX( speakerBounds.getCenterX() );
             outputLine_.setEndY( speakerBounds.getCenterY() );
             SynthesizeApplication.speakerConnectedWidgets.add( this );
+
         }
-        // 本身是Wave音檔且有volume存在，則可以連到"單一"volume
-        else if( this.title_.getText().contains("Wave") && SynthesizeApplication.volumeWidget != null ){
+        // 要改！！！
+
+        // connect to volume
+        else if( SynthesizeApplication.volumeWidget != null ){
             Circle volumeInput = SynthesizeApplication.volumeWidget.inputDot;
             Bounds volumeInputBounds = volumeInput.localToScene( volumeInput.getBoundsInLocal() );
             double distanceToVolume = Math.sqrt( Math.pow( volumeInputBounds.getCenterX() - e.getSceneX(), 2.0 ) + Math.pow( volumeInputBounds.getCenterY() - e.getSceneY(), 2.0 ) );
@@ -209,13 +214,47 @@ public class AudioComponentWidgetBase extends Pane {
                 outputConnectedWidget = SynthesizeApplication.volumeWidget;
                 SynthesizeApplication.volumeWidget.inputConnectedWidgets.add(this);
                 SynthesizeApplication.volumeWidget.ac_.connectInput(this.ac_);
-//                Mixer volumeMixer = new Mixer();
-//                SynthesizeApplication.volumeWidget.ac_ = volumeMixer.g volumeMixer.connectInput(this.ac_);
             }else{
                 parent_.getChildren().remove(outputLine_);
                 outputLine_ = null;
             }
         }
+        // connect to mixer
+        else if( SynthesizeApplication.mixerWidget != null ){
+            Circle mixerInput = SynthesizeApplication.mixerWidget.inputDot;
+            Bounds mixerInputBounds = mixerInput.localToScene( mixerInput.getBoundsInLocal() );
+            double distanceToMixer = Math.sqrt( Math.pow( mixerInputBounds.getCenterX() - e.getSceneX(), 2.0 ) + Math.pow( mixerInputBounds.getCenterY() - e.getSceneY(), 2.0 ) );
+            if( distanceToMixer < 13 ){
+                outputLine_.setEndX( mixerInputBounds.getCenterX() );
+                outputLine_.setEndY( mixerInputBounds.getCenterY() );
+                outputConnectedWidget = SynthesizeApplication.mixerWidget;
+                SynthesizeApplication.mixerWidget.inputConnectedWidgets.add(this);
+                outputConnectedWidget.ac_.connectInput(this.ac_);
+//                SynthesizeApplication.mixerWidget.ac_.connectInput(this.ac_);
+            }else{
+                parent_.getChildren().remove(outputLine_);
+                outputLine_ = null;
+            }
+        }
+        // 本身是Wave音檔且有volume存在，則可以連到"單一"volume // 因為怕sine 連sine
+//        else if( this.title_.getText().contains("Wave") && SynthesizeApplication.volumeWidget != null ){
+//            Circle volumeInput = SynthesizeApplication.volumeWidget.inputDot;
+//            Bounds volumeInputBounds = volumeInput.localToScene( volumeInput.getBoundsInLocal() );
+//            double distanceToVolume = Math.sqrt( Math.pow( volumeInputBounds.getCenterX() - e.getSceneX(), 2.0 ) + Math.pow( volumeInputBounds.getCenterY() - e.getSceneY(), 2.0 ) );
+//            if( distanceToVolume < 13 ){
+//                outputLine_.setEndX( volumeInputBounds.getCenterX() );
+//                outputLine_.setEndY( volumeInputBounds.getCenterY() );
+//                outputConnectedWidget = SynthesizeApplication.volumeWidget;
+//                SynthesizeApplication.volumeWidget.inputConnectedWidgets.add(this);
+//                SynthesizeApplication.volumeWidget.ac_.connectInput(this.ac_);
+////                Mixer volumeMixer = new Mixer();
+////                SynthesizeApplication.volumeWidget.ac_ = volumeMixer.g volumeMixer.connectInput(this.ac_);
+//            }else{
+//                parent_.getChildren().remove(outputLine_);
+//                outputLine_ = null;
+//            }
+//        }
+        // no connection
         else{
             parent_.getChildren().remove(outputLine_);
             outputLine_ = null;
